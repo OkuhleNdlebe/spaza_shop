@@ -28,3 +28,11 @@ Route::get('/stores/create', [StoreController::class, 'create'])->name('stores.c
 Route::post('/stores', [StoreController::class, 'store'])->name('stores.store');
 Route::get('/stores/{id}', [StoreController::class, 'show'])->name('stores.show');
 Route::get('/stores/{id}/qrcode', [StoreController::class, 'generateQRCode'])->name('stores.qrcode');
+
+use App\Http\Controllers\SupplierController;
+
+Route::resource('suppliers', SupplierController::class);
+
+use App\Http\Controllers\ProductController;
+
+Route::resource('products', ProductController::class);
