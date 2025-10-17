@@ -19,6 +19,10 @@
                 </div>
             </div>
         @endforeach
+        <!-- After the stores loop -->
+<div class="mt-4">
+    {{ $stores->links() }}
+</div>
     </div>
 </div>
 @endsection

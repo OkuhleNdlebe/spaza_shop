@@ -32,10 +32,15 @@
             <textarea name="description" class="form-control"></textarea>
         </div>
 
-        <!-- Manufacturer -->
+        <!-- Manufacturer Dropdown -->
         <div class="mb-3">
             <label class="form-label">Manufacturer</label>
-            <input type="text" name="manufacturer" class="form-control">
+            <select name="manufacturer_id" class="form-control" required>
+                <option value="" disabled selected>Select Manufacturer</option>
+                @foreach($manufacturers as $manufacturer)
+                    <option value="{{ $manufacturer->id }}">{{ $manufacturer->name }}</option>
+                @endforeach
+            </select>
         </div>
 
         <!-- Expiry Date -->

@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\Manufacturer;
+use Illuminate\Support\Facades\Response;
 
 class ProductController extends Controller
 {
@@ -15,7 +17,7 @@ class ProductController extends Controller
     public function index()
     {
         // Fetch all products with their associated suppliers
-        $products = Product::with('supplier')->get();
+    $products = Product::with(['supplier', 'manufacturer'])->get();
         return view('products.index', compact('products'));
     }
 
@@ -23,11 +25,11 @@ class ProductController extends Controller
      * Show the form for creating a new product assigned to a supplier.
      */
     public function create()
-    {
-        // Fetch all suppliers
-        $suppliers = Supplier::all();
-        return view('products.create', compact('suppliers'));
-    }
+{
+    $suppliers = Supplier::all();
+    $manufacturers = Manufacturer::all();
+    return view('products.create', compact('suppliers', 'manufacturers'));
+}
 
     /**
      * Store a newly created product and generate its QR code.
@@ -37,9 +39,9 @@ class ProductController extends Controller
         // Validate the incoming request
         $request->validate([
             'supplier_id' => 'required|exists:suppliers,id',
+            'manufacturer_id' => 'required|exists:manufacturers,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'manufacturer' => 'nullable|string|max:255',
             'expiry_date' => 'nullable|date',
         ]);
 
@@ -66,4 +68,41 @@ class ProductController extends Controller
     {
         return view('products.show', compact('product'));
     }
+
+
+
+public function export()
+{
+    $products = Product::with(['supplier', 'manufacturer'])->get();
+    
+    $csvFileName = 'products_export_' . date('Y-m-d_H-i-s') . '.csv';
+    
+    $headers = [
+        'Content-Type' => 'text/csv; charset=utf-8',
+        'Content-Disposition' => 'attachment; filename="' . $csvFileName . '"',
+    ];
+
+    $callback = function() use ($products) {
+        $file = fopen('php://output', 'w');
+        fwrite($file, "\xEF\xBB\xBF"); // UTF-8 BOM
+        
+        fputcsv($file, ['ID', 'Name', 'Description', 'Manufacturer', 'Supplier', 'Price', 'Expiry Date']);
+        
+        foreach ($products as $product) {
+            fputcsv($file, [
+                $product->id,
+                $product->name,
+                $product->description,
+                $product->manufacturer->name ?? 'N/A',
+                $product->supplier->company_name ?? 'N/A',
+                $product->price,
+                $product->expiry_date
+            ]);
+        }
+        
+        fclose($file);
+    };
+    
+    return Response::stream($callback, 200, $headers);
+}
 }
