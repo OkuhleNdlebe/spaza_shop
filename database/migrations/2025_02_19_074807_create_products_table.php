@@ -17,11 +17,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('manufacturer');
+            // Remove old: $table->string('manufacturer');
+            $table->unsignedBigInteger('manufacturer_id'); // <-- Foreign key
             $table->date('expiry_date');
             $table->decimal('price', 10, 2);
             $table->unsignedBigInteger('supplier_id');
             $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
+            $table->foreign('manufacturer_id')->references('id')->on('manufacturers')->onDelete('cascade');
             $table->timestamps();
         });
     }
