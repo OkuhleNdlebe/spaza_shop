@@ -57,4 +57,4 @@ COPY --from=node_build /app/public /var/www/html/public
 EXPOSE 8080
 
 # Run Laravel using PHP-FPM
-CMD ["php-fpm"]
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
