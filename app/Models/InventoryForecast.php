@@ -8,29 +8,32 @@ use Illuminate\Database\Eloquent\Model;
 class InventoryForecast extends Model
 {
     use HasFactory;
+    
     protected $fillable = [
         'product_id',
         'store_id',
-        'predicted_stockout_date',
-        'stockout_probability',
         'current_stock',
-        'average_daily_sales',
-        'safety_stock_level',
-        'factors'
+        'predicted_demand',
+        'recommended_order',
+        'stockout_risk_date',
+        'stockout_probability',
+        'forecast_date',
+        'for_date'
     ];
-      // Add date casting
+    
     protected $casts = [
         'stockout_risk_date' => 'date',
         'forecast_date' => 'date',
         'for_date' => 'date'
     ];
+    
     public function product()
-{
-    return $this->belongsTo(Product::class);
-}
-
-public function store()
-{
-    return $this->belongsTo(Store::class);
-}
+    {
+        return $this->belongsTo(Product::class);
+    }
+    
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 }

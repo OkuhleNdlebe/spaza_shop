@@ -11,10 +11,11 @@ use Illuminate\Support\Facades\DB;
 class SaleController extends Controller
 {
     public function reports()
-{
-    $stores = Store::all(); // Add this line
-    return view('sales.reports', compact('stores')); // Update this line
-}
+    {
+        $stores = Store::all(); // ADD THIS
+        return view('sales.reports', compact('stores'));
+    }
+    
     public function index()
     {
         $sales = Sale::with(['store', 'product'])
@@ -46,12 +47,10 @@ class SaleController extends Controller
             'notes' => 'nullable|string'
         ]);
 
-        // Calculate total amount
         $validated['total_amount'] = $validated['quantity'] * $validated['unit_price'];
 
         Sale::create($validated);
 
-        // Update store product quantity (reduce stock)
         DB::table('store_product')
             ->where('store_id', $validated['store_id'])
             ->where('product_id', $validated['product_id'])
@@ -94,11 +93,6 @@ class SaleController extends Controller
         ));
     }
 
-    // public function reports()
-    // {
-    //     return view('sales.reports');
-    // }
-
     public function generateReport(Request $request)
     {
         $validated = $request->validate([
@@ -122,34 +116,37 @@ class SaleController extends Controller
     }
 
     public function edit(Sale $sale)
-{
-    $stores = Store::all();
-    $products = Product::all();
-    return view('sales.edit', compact('sale', 'stores', 'products'));
-}
+    {
+        $stores = Store::all();
+        $products = Product::all();
+        return view('sales.edit', compact('sale', 'stores', 'products'));
+    }
 
-public function update(Request $request, Sale $sale)
-{
-    $validated = $request->validate([
-        'store_id' => 'required|exists:stores,id',
-        'product_id' => 'required|exists:products,id',
-        'quantity' => 'required|integer|min:1',
-        'unit_price' => 'required|numeric|min:0',
-        'sale_date' => 'required|date',
-        'notes' => 'nullable|string'
-    ]);
+    public function update(Request $request, Sale $sale)
+    {
+        $validated = $request->validate([
+            'store_id' => 'required|exists:stores,id',
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'unit_price' => 'required|numeric|min:0',
+            'sale_date' => 'required|date',
+            'notes' => 'nullable|string'
+        ]);
 
-    $validated['total_amount'] = $validated['quantity'] * $validated['unit_price'];
-    $sale->update($validated);
+        $validated['total_amount'] = $validated['quantity'] * $validated['unit_price'];
+        
+        // Adjust stock if store/product changed
+        // This is simplified - you may need more complex logic
+        $sale->update($validated);
 
-    return redirect()->route('sales.show', $sale)
-        ->with('success', 'Sale updated successfully!');
-}
+        return redirect()->route('sales.show', $sale)
+            ->with('success', 'Sale updated successfully!');
+    }
 
-public function destroy(Sale $sale)
-{
-    $sale->delete();
-    return redirect()->route('sales.index')
-        ->with('success', 'Sale deleted successfully!');
-}
+    public function destroy(Sale $sale)
+    {
+        $sale->delete();
+        return redirect()->route('sales.index')
+            ->with('success', 'Sale deleted successfully!');
+    }
 }

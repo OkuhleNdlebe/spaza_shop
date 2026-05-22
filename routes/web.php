@@ -1,69 +1,102 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StoreController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ManufacturerController;
+use App\Http\Controllers\StoreProductController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\BulkProductController;
+use App\Http\Controllers\SaleController;
+use App\Http\Controllers\PredictiveAnalyticsController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
+// Welcome Page
 Route::get('/', function () {
     return view('welcome');
 });
 
-use App\Http\Controllers\StoreController;
-
-// Route::get('/stores', [StoreController::class, 'index'])->name('stores.index');
-// Route::get('/stores/{id}', [StoreController::class, 'show'])->name('stores.show');
-// Route::get('/stores/create', [StoreController::class, 'create'])->name('stores.create');
-
+// =============================================
+// STORE ROUTES
+// =============================================
 Route::get('/stores', [StoreController::class, 'index'])->name('stores.index');
 Route::get('/stores/create', [StoreController::class, 'create'])->name('stores.create');
 Route::post('/stores', [StoreController::class, 'store'])->name('stores.store');
 Route::get('/stores/{id}', [StoreController::class, 'show'])->name('stores.show');
+Route::get('/stores/{id}/edit', [StoreController::class, 'edit'])->name('stores.edit');
+Route::put('/stores/{id}', [StoreController::class, 'update'])->name('stores.update');
+Route::delete('/stores/{id}', [StoreController::class, 'destroy'])->name('stores.destroy');
 Route::get('/stores/{id}/qrcode', [StoreController::class, 'generateQRCode'])->name('stores.qrcode');
 
-use App\Http\Controllers\SupplierController;
-
+// =============================================
+// SUPPLIER ROUTES (Full Resource)
+// =============================================
 Route::resource('suppliers', SupplierController::class);
 
-use App\Http\Controllers\ProductController;
-
-Route::resource('products', ProductController::class);
-
-use App\Http\Controllers\ManufacturerController;
+// =============================================
+// MANUFACTURER ROUTES (Full Resource)
+// =============================================
 Route::resource('manufacturers', ManufacturerController::class);
 
-use App\Http\Controllers\StoreProductController;
+// =============================================
+// PRODUCT ROUTES
+// =============================================
+Route::resource('products', ProductController::class);
+Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
 
+// =============================================
+// BULK PRODUCT OPERATIONS
+// =============================================
+Route::get('/products/bulk', [BulkProductController::class, 'index'])->name('products.bulk');
+Route::post('/products/bulk/import', [BulkProductController::class, 'import'])->name('products.bulk.import');
+Route::get('/products/bulk/export', [BulkProductController::class, 'export'])->name('products.bulk.export');
+Route::get('/products/bulk/template', [BulkProductController::class, 'downloadTemplate'])->name('products.bulk.template');
+
+// =============================================
+// STORE PRODUCT ROUTES (Assign products to stores)
+// =============================================
 Route::get('/stores/{store}/products/register', [StoreProductController::class, 'create'])->name('store_products.create');
 Route::post('/stores/{store}/products/register', [StoreProductController::class, 'store'])->name('store_products.store');
 
-use App\Http\Controllers\DashboardController;
+// =============================================
+// DASHBOARD ROUTES
+// =============================================
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-use App\Http\Controllers\BulkProductController;
-// Bulk product operations
-Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
-
-// Reports
-// routes/web.php
-// Sales routes
-use App\Http\Controllers\SaleController;
+// =============================================
+// SALES ROUTES
+// =============================================
 Route::resource('sales', SaleController::class);
 Route::get('/sales-dashboard', [SaleController::class, 'dashboard'])->name('sales.dashboard');
 Route::get('/sales-reports', [SaleController::class, 'reports'])->name('sales.reports');
 Route::post('/sales-generate-report', [SaleController::class, 'generateReport'])->name('sales.generate-report');
 
-// Predictive Analytics
-use App\Http\Controllers\PredictiveAnalyticsController;
-Route::get('/analytics', [PredictiveAnalyticsController::class, 'index'])->name('analytics.index');
-Route::post('/analytics/predict', [PredictiveAnalyticsController::class, 'predict'])->name('analytics.predict');    
-Route::get('/analytics/dashboard', [PredictiveAnalyticsController::class, 'dashboard'])->name('analytics.dashboard');  
-Route::get('/generate-predictions', [PredictiveAnalyticsController::class, 'generatePredictions'])->name('analytics.generate');
+// =============================================
+// PREDICTIVE ANALYTICS ROUTES (FIXED)
+// =============================================
+// Dashboard view (GET)
+Route::get('/analytics/dashboard', [PredictiveAnalyticsController::class, 'dashboard'])->name('analytics.dashboard');
+
+// Generate predictions (POST - FIXED FROM GET TO POST)
+Route::post('/generate-predictions', [PredictiveAnalyticsController::class, 'generatePredictions'])->name('analytics.generate');
+// Create sample data for testing (GET)
+Route::get('/analytics/sample', [PredictiveAnalyticsController::class, 'createSamplePredictions'])->name('analytics.sample');
+
+// Redirect /analytics to dashboard
+Route::get('/analytics', function() {
+    return redirect()->route('analytics.dashboard');
+});
+
+// =============================================
+// REPORT ROUTES
+// =============================================
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/reports/sales', [ReportController::class, 'generateSalesReport'])->name('reports.sales');
+Route::get('/reports/inventory', [ReportController::class, 'inventoryReport'])->name('reports.inventory');
