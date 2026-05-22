@@ -11,6 +11,9 @@ use App\Http\Controllers\BulkProductController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\PredictiveAnalyticsController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\FloatingChatbotController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -100,3 +103,19 @@ Route::get('/analytics', function() {
 Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 Route::get('/reports/sales', [ReportController::class, 'generateSalesReport'])->name('reports.sales');
 Route::get('/reports/inventory', [ReportController::class, 'inventoryReport'])->name('reports.inventory');
+
+// =============================================
+// CHATBOT ROUTES
+// =============================================
+Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
+Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
+Route::post('/chatbot/clear', [ChatbotController::class, 'clearConversation'])->name('chatbot.clear');
+
+// =============================================
+//Floating chatbot widget route
+// =============================================
+// Floating Chatbot Routes
+
+Route::post('/chatbot/send', [FloatingChatbotController::class, 'sendMessage'])->name('chatbot.send');
+Route::post('/chatbot/clear', [FloatingChatbotController::class, 'clearConversation'])->name('chatbot.clear');
+Route::get('/chatbot/unread', [FloatingChatbotController::class, 'getUnreadCount'])->name('chatbot.unread');
