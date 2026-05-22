@@ -16,6 +16,11 @@ RUN apt-get update && apt-get install -y \
 # Copy application files
 COPY . .
 
+# SQLite setup
+RUN mkdir -p /var/www/html/database \
+    && touch /var/www/html/database/database.sqlite \
+    && chown -R www-data:www-data /var/www/html/database
+
 # Allow Composer to run as root
 ENV COMPOSER_ALLOW_SUPERUSER=1
 

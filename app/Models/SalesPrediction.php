@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class SalesPrediction extends Model
 {
     use HasFactory;
+    
     protected $fillable = [
         'product_id',
         'store_id',
@@ -17,21 +18,20 @@ class SalesPrediction extends Model
         'for_date',
         'factors'
     ];
-
-    // Add date casting
+    
     protected $casts = [
         'prediction_date' => 'date',
         'for_date' => 'date',
         'factors' => 'array'
     ];
+    
     public function product()
-{
-    return $this->belongsTo(Product::class);
-}
-
-public function store()
-{
-    return $this->belongsTo(Store::class);
-}
-
+    {
+        return $this->belongsTo(Product::class);
+    }
+    
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 }

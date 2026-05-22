@@ -29,7 +29,7 @@ class StoreProductController extends Controller
         $store->products()->attach($product->id, [
             'quantity'     => $data['quantity'],
             'delivered_at' => $data['delivered_at'] ?? now(),
-            'expire_date'  => $product->expire_date, // pulled from product
+            'expire_date'  => $product->expiry_date, // FIXED: was expire_date
         ]);
 
         return redirect()->route('stores.show', $store)

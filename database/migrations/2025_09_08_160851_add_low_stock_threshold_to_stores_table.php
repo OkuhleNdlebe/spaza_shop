@@ -14,9 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::table('stores', function (Blueprint $table) {
-            //
-            $table->integer('low_stock_threshold')->default(5)->after('contact_number');
-
+            // Check if column doesn't exist before adding (prevents errors)
+            if (!Schema::hasColumn('stores', 'low_stock_threshold')) {
+                $table->integer('low_stock_threshold')->default(5)->after('contact_number');
+            }
         });
     }
 
@@ -28,7 +29,10 @@ return new class extends Migration
     public function down()
     {
         Schema::table('stores', function (Blueprint $table) {
-            //
+            // FIXED: Actually drop the column when rolling back
+            if (Schema::hasColumn('stores', 'low_stock_threshold')) {
+                $table->dropColumn('low_stock_threshold');
+            }
         });
     }
 };

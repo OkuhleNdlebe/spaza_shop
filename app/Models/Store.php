@@ -9,7 +9,7 @@ class Store extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'location', 'owner_name', 'contact_number', 'low_stock_threshold'];
+    protected $fillable = ['name', 'location', 'owner_name', 'contact_number', 'low_stock_threshold']; // ADD low_stock_threshold
     
     public function products()
 {
